@@ -36,15 +36,28 @@ app.get("/api/tickets", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const status = req.query.status;
 
     const [results] = await pool.query(
       `SELECT * FROM tickets ORDER BY created_at DESC LIMIT ? OFFSET ?`,
       [limit, offset],
     );
+    const [filteredByStatus] = await pool.query(
+      `SELECT * FROM tickets WHERE status = ? ORDER BY created_at DESC`, [status]
+    );
+
+    const [countResults] = await pool.query(
+      `SELECT COUNT(*) AS totalTickets FROM tickets`,
+    );
+    const totalTickets = countResults[0].totalTickets;
+    const totalPages = Math.ceil(totalTickets / limit);
     res.status(200).json({
       page,
       limit,
-      results
+      results,
+      totalTickets,
+      totalPages,
+      filteredByStatus
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
