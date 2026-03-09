@@ -38,17 +38,22 @@ app.get("/api/tickets", async (req, res) => {
     const offset = (page - 1) * limit;
     const status = req.query.status;
 
-    const [results] = await pool.query(
-      `SELECT * FROM tickets ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      [limit, offset],
-    );
-    const [filteredByStatus] = await pool.query(
-      `SELECT * FROM tickets WHERE status = ? ORDER BY created_at DESC`, [status]
-    );
+    let query = `SELECT * FROM tickets`;
+    let countQuery = `SELECT COUNT(*) AS totalTickets FROM tickets`;
+    let params = [];
 
-    const [countResults] = await pool.query(
-      `SELECT COUNT(*) AS totalTickets FROM tickets`,
-    );
+    if (status) {
+        query += ` WHERE status = ?`;
+        countQuery += ` WHERE status = ?`;
+        params.push(status);
+    }
+
+    query += ` ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+    params.push(limit, offset);
+
+    const [results] = await pool.query(query, params);
+
+    const [countResults] = await pool.query(countQuery, status ? [status] : []);
     const totalTickets = countResults[0].totalTickets;
     const totalPages = Math.ceil(totalTickets / limit);
     res.status(200).json({
@@ -57,7 +62,6 @@ app.get("/api/tickets", async (req, res) => {
       results,
       totalTickets,
       totalPages,
-      filteredByStatus
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
