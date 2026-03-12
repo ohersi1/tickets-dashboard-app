@@ -37,23 +37,36 @@ app.get("/api/tickets", async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const status = req.query.status;
+    const priority = req.query.priority;
 
     let query = `SELECT * FROM tickets`;
     let countQuery = `SELECT COUNT(*) AS totalTickets FROM tickets`;
+
+    let conditions = [];
     let params = [];
 
     if (status) {
-        query += ` WHERE status = ?`;
-        countQuery += ` WHERE status = ?`;
-        params.push(status);
+      conditions.push("status = ?");
+      params.push(status);
     }
 
+    if (priority) {
+      conditions.push("priority = ?");
+      params.push(priority);
+    }
+
+    if (conditions.length > 0) {
+      query += " WHERE " + conditions.join(" AND ");
+      countQuery += " WHERE " + conditions.join(" AND ");
+    }
+    let filterParams = [...params];
     query += ` ORDER BY created_at DESC LIMIT ? OFFSET ?`;
     params.push(limit, offset);
 
     const [results] = await pool.query(query, params);
 
-    const [countResults] = await pool.query(countQuery, status ? [status] : []);
+    const [countResults] = await pool.query(countQuery, filterParams);
+
     const totalTickets = countResults[0].totalTickets;
     const totalPages = Math.ceil(totalTickets / limit);
     res.status(200).json({
