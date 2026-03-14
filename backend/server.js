@@ -38,6 +38,7 @@ app.get("/api/tickets", async (req, res) => {
     const offset = (page - 1) * limit;
     const status = req.query.status;
     const priority = req.query.priority;
+    const search = req.query.search?.trim();
 
     let query = `SELECT * FROM tickets`;
     let countQuery = `SELECT COUNT(*) AS totalTickets FROM tickets`;
@@ -53,6 +54,12 @@ app.get("/api/tickets", async (req, res) => {
     if (priority) {
       conditions.push("priority = ?");
       params.push(priority);
+    }
+
+    if (search) {
+      const searchTerm = `%${search}%`;
+      conditions.push("(title LIKE ? OR description LIKE ?)");
+      params.push(searchTerm, searchTerm);
     }
 
     if (conditions.length > 0) {
@@ -72,8 +79,8 @@ app.get("/api/tickets", async (req, res) => {
     res.status(200).json({
       page,
       limit,
-      results,
       totalTickets,
+      results,
       totalPages,
     });
   } catch (error) {
