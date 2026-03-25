@@ -37,22 +37,21 @@ function App() {
     let query = [];
 
     if (searchValue) {
-      query.push(`search=${encodeURIComponent(searchValue.trim())}`)
+      query.push(`search=${encodeURIComponent(searchValue.trim())}`);
     }
     if (statusValue) {
-      query.push(`status=${encodeURIComponent(statusValue)}`)
+      query.push(`status=${encodeURIComponent(statusValue)}`);
     }
-     if (priorityValue) {
-      query.push(`priority=${encodeURIComponent(priorityValue)}`)
+    if (priorityValue) {
+      query.push(`priority=${encodeURIComponent(priorityValue)}`);
     }
     if (query.length === 0) {
       fetchTickets();
       return;
     }
     fetchQuery += query.join("&");
-    fetch(
-      fetchQuery,
-    )
+    console.log(fetchQuery);
+    fetch(fetchQuery)
       .then((res) => res.json())
       .then((data) => {
         setTickets(data.results);
@@ -69,7 +68,7 @@ function App() {
     setStatusValue("");
     setPriorityValue("");
     setError(null);
-    
+
     fetchTickets();
   };
 
@@ -86,14 +85,24 @@ function App() {
       <button onClick={handleSearch}>Search</button>
       <button onClick={handleReset}>Reset</button>
       <label htmlFor="status"> Status </label>
-      <select name="status" id="status" value={statusValue} onChange={(e) => setStatusValue(e.target.value)} >
+      <select
+        name="status"
+        id="status"
+        value={statusValue}
+        onChange={(e) => setStatusValue(e.target.value)}
+      >
         <option value="">ALL</option>
         <option value="OPEN">OPEN</option>
         <option value="IN_PROGRESS">IN_PROGRESS</option>
         <option value="RESOLVED">RESOLVED</option>
       </select>
       <label htmlFor="priority"> Priority </label>
-      <select name="priority" id="priority" value={priorityValue} onChange={(e) => setPriorityValue(e.target.value)}>
+      <select
+        name="priority"
+        id="priority"
+        value={priorityValue}
+        onChange={(e) => setPriorityValue(e.target.value)}
+      >
         <option value="">ALL</option>
         <option value="LOW">LOW</option>
         <option value="MEDIUM">MEDIUM</option>
@@ -112,14 +121,18 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {tickets.map((ticket) => (
-              <tr key={ticket.id}>
-                <td>{ticket.title}</td>
-                <td>{ticket.priority}</td>
-                <td>{ticket.status}</td>
-                <td>{new Date(ticket.created_at).toLocaleDateString()}</td>
-              </tr>
-            ))}
+            {tickets.length === 0 ? (
+              <tr><td colSpan={4}>No tickets found!</td></tr>
+            ) : (
+              tickets.map((ticket) => (
+                <tr key={ticket.id}>
+                  <td>{ticket.title}</td>
+                  <td>{ticket.priority}</td>
+                  <td>{ticket.status}</td>
+                  <td>{new Date(ticket.created_at).toLocaleDateString()}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       )}
