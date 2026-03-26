@@ -9,22 +9,26 @@ function App() {
   const [searchValue, setSearchValue] = useState("");
   const [statusValue, setStatusValue] = useState("");
   const [priorityValue, setPriorityValue] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   // eslint-disable-next-line react-hooks/exhaustive-deps
+
   const fetchTickets = useCallback(() => {
     setLoading(true);
     setError(null);
 
-    fetch("http://localhost:3000/api/tickets")
+    fetch(`http://localhost:3000/api/tickets?page=${page}`)
       .then((res) => res.json())
       .then((data) => {
         setTickets(data.results);
+        setTotalPages(data.totalPages);
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     fetchTickets();
@@ -136,6 +140,7 @@ function App() {
           </tbody>
         </table>
       )}
+      <button onClick={() => setPage(prevState => prevState === 1 ? 1 : prevState - 1)} disabled={page === 1}>Prev</button> Page {page} of {totalPages} <button onClick={() => setPage(prevState => prevState === totalPages ? totalPages : prevState + 1)} disabled={page === totalPages}>Next</button>
     </div>
   );
 }
