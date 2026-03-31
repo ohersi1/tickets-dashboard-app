@@ -9,6 +9,9 @@ function App() {
   const [searchValue, setSearchValue] = useState("");
   const [statusValue, setStatusValue] = useState("");
   const [priorityValue, setPriorityValue] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
+  const [appliedStatus, setAppliedStatus] = useState("");
+  const [appliedPriority, setAppliedPriority] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -35,6 +38,10 @@ function App() {
   }, [fetchTickets]);
 
   const handleSearch = () => {
+    setAppliedSearch(searchValue);
+    setAppliedStatus(statusValue);
+    setAppliedPriority(priorityValue);
+    setPage(1);
     setLoading(true);
     setError(null);
     let fetchQuery = "http://localhost:3000/api/tickets?";
