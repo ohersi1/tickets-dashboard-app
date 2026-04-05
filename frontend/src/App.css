@@ -1,0 +1,126 @@
+/* GLOBAL */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+/* MAIN CONTAINER */
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+/* TITLE */
+h1 {
+  margin-bottom: 20px;
+  font-size: 28px;
+}
+
+/* CONTROLS (search + filters) */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* INPUT + SELECT */
+input,
+select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #1e293b;
+  color: #e2e8f0;
+}
+
+input::placeholder {
+  color: #94a3b8;
+}
+
+/* BUTTONS */
+button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #1e293b;
+  color: #e2e8f0;
+  transition: 0.2s;
+}
+
+button:hover {
+  background-color: #334155;
+}
+
+/* PRIMARY BUTTON */
+.search-btn {
+  background-color: #2563eb;
+}
+
+.search-btn:hover {
+  background-color: #1d4ed8;
+}
+
+/* RESET BUTTON */
+.reset-btn {
+  background-color: #475569;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1e293b;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* HEADER */
+thead {
+  background-color: #334155;
+}
+
+th {
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+}
+
+/* ROWS */
+td {
+    text-align: left;
+  padding: 12px;
+  border-top: 1px solid #334155;
+}
+
+/* ZEBRA STRIPING */
+tr:nth-child(even) {
+  background-color: #162546;
+}
+
+/* EMPTY STATE */
+td[colspan] {
+  text-align: center;
+  padding: 20px;
+  color: #94a3b8;
+}
+
+/* PAGINATION */
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* DISABLED BUTTON */
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* #0f172a */

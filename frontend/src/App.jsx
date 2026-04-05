@@ -19,8 +19,24 @@ function App() {
   const fetchTickets = useCallback(() => {
     setLoading(true);
     setError(null);
+    let fetchQuery = `http://localhost:3000/api/tickets?page=${page}`;
+    let query = [];
+    if (appliedSearch) {
+      query.push(`search=${encodeURIComponent(appliedSearch)}`);
+    }
+    if (appliedStatus) {
+      query.push(`status=${encodeURIComponent(appliedStatus)}`);
+    }
+    if (appliedPriority) {
+      query.push(`priority=${encodeURIComponent(appliedPriority)}`);
+    }
 
-    fetch(`http://localhost:3000/api/tickets?page=${page}`)
+    if (query.length > 0) {
+      fetchQuery += "&";
+      fetchQuery += query.join("&");
+    }
+    console.log(fetchQuery);
+    fetch(fetchQuery)
       .then((res) => res.json())
       .then((data) => {
         setTickets(data.results);
@@ -31,94 +47,72 @@ function App() {
         setError(err.message);
         setLoading(false);
       });
-  }, [page]);
+  }, [page, appliedSearch, appliedStatus, appliedPriority]);
 
   useEffect(() => {
     fetchTickets();
   }, [fetchTickets]);
 
   const handleSearch = () => {
-    setAppliedSearch(searchValue);
+    setAppliedSearch(searchValue.trim());
     setAppliedStatus(statusValue);
     setAppliedPriority(priorityValue);
     setPage(1);
-    setLoading(true);
-    setError(null);
-    let fetchQuery = "http://localhost:3000/api/tickets?";
-    let query = [];
-
-    if (searchValue) {
-      query.push(`search=${encodeURIComponent(searchValue.trim())}`);
-    }
-    if (statusValue) {
-      query.push(`status=${encodeURIComponent(statusValue)}`);
-    }
-    if (priorityValue) {
-      query.push(`priority=${encodeURIComponent(priorityValue)}`);
-    }
-    if (query.length === 0) {
-      fetchTickets();
-      return;
-    }
-    fetchQuery += query.join("&");
-    console.log(fetchQuery);
-    fetch(fetchQuery)
-      .then((res) => res.json())
-      .then((data) => {
-        setTickets(data.results);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
   };
 
   const handleReset = () => {
     setSearchValue("");
     setStatusValue("");
     setPriorityValue("");
+    setAppliedSearch("");
+    setAppliedStatus("");
+    setAppliedPriority("");
+    setPage(1);
     setError(null);
-
-    fetchTickets();
   };
 
   return (
-    <div>
+    <div className="container">
       <h1>Tickets Dashboard</h1>
       {error && <p>Error: {error}</p>}
-      <input
-        type="text"
-        placeholder="Search tickets..."
-        value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
-      />
-      <button onClick={handleSearch}>Search</button>
-      <button onClick={handleReset}>Reset</button>
-      <label htmlFor="status"> Status </label>
-      <select
-        name="status"
-        id="status"
-        value={statusValue}
-        onChange={(e) => setStatusValue(e.target.value)}
-      >
-        <option value="">ALL</option>
-        <option value="OPEN">OPEN</option>
-        <option value="IN_PROGRESS">IN_PROGRESS</option>
-        <option value="RESOLVED">RESOLVED</option>
-      </select>
-      <label htmlFor="priority"> Priority </label>
-      <select
-        name="priority"
-        id="priority"
-        value={priorityValue}
-        onChange={(e) => setPriorityValue(e.target.value)}
-      >
-        <option value="">ALL</option>
-        <option value="LOW">LOW</option>
-        <option value="MEDIUM">MEDIUM</option>
-        <option value="HIGH">HIGH</option>
-      </select>
+      <div className="controls">
+        <input
+          type="text"
+          placeholder="Search tickets..."
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+        />
+        <button className="search-btn" onClick={handleSearch}>
+          Search
+        </button>
+        <button className="reset-btn" onClick={handleReset}>
+          Reset
+        </button>
+        <label htmlFor="status"> Status </label>
+        <select
+          name="status"
+          id="status"
+          value={statusValue}
+          onChange={(e) => setStatusValue(e.target.value)}
+        >
+          <option value="">ALL</option>
+          <option value="OPEN">OPEN</option>
+          <option value="IN_PROGRESS">IN_PROGRESS</option>
+          <option value="RESOLVED">RESOLVED</option>
+        </select>
+        <label htmlFor="priority"> Priority </label>
+        <select
+          name="priority"
+          id="priority"
+          value={priorityValue}
+          onChange={(e) => setPriorityValue(e.target.value)}
+        >
+          <option value="">ALL</option>
+          <option value="LOW">LOW</option>
+          <option value="MEDIUM">MEDIUM</option>
+          <option value="HIGH">HIGH</option>
+        </select>
+      </div>
       {loading ? (
         <p>Loading tickets...</p>
       ) : (
@@ -133,7 +127,9 @@ function App() {
           </thead>
           <tbody>
             {tickets.length === 0 ? (
-              <tr><td colSpan={4}>No tickets found!</td></tr>
+              <tr>
+                <td colSpan={4}>No tickets found!</td>
+              </tr>
             ) : (
               tickets.map((ticket) => (
                 <tr key={ticket.id}>
@@ -147,7 +143,27 @@ function App() {
           </tbody>
         </table>
       )}
-      <button onClick={() => setPage(prevState => prevState === 1 ? 1 : prevState - 1)} disabled={page === 1}>Prev</button> Page {page} of {totalPages} <button onClick={() => setPage(prevState => prevState === totalPages ? totalPages : prevState + 1)} disabled={page === totalPages}>Next</button>
+      <div className="pagination">
+        <button
+          onClick={() =>
+            setPage((prevState) => (prevState === 1 ? 1 : prevState - 1))
+          }
+          disabled={page <= 1}
+        >
+          Prev
+        </button>{" "}
+        Page {page} of {totalPages}{" "}
+        <button
+          onClick={() =>
+            setPage((prevState) =>
+              prevState === totalPages ? totalPages : prevState + 1,
+            )
+          }
+          disabled={page >= totalPages}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
