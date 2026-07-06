@@ -77,7 +77,7 @@ app.get("/api/tickets", async (req, res) => {
     const [countResults] = await pool.query(countQuery, filterParams);
 
     const totalTickets = countResults[0].totalTickets;
-    const totalPages = Math.ceil(totalTickets / limit);
+    const totalPages = Math.max(1, Math.ceil(totalTickets / limit));
     res.status(200).json({
       page,
       limit,
@@ -92,7 +92,7 @@ app.get("/api/tickets", async (req, res) => {
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
-
+// Remember to delete this GET request later
 app.get("/test-db", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT COUNT(*) as count FROM tickets");
