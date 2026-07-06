@@ -39,6 +39,7 @@ function App() {
     fetch(fetchQuery)
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         setTickets(data.results);
         setTotalPages(data.totalPages);
         setLoading(false);
@@ -73,96 +74,126 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Tickets Dashboard</h1>
-      {error && <p>Error: {error}</p>}
-      <div className="controls">
-        <input
-          type="text"
-          placeholder="Search tickets..."
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-        <button className="search-btn" onClick={handleSearch}>
-          Search
-        </button>
-        <button className="reset-btn" onClick={handleReset}>
-          Reset
-        </button>
-        <label htmlFor="status"> Status </label>
-        <select
-          name="status"
-          id="status"
-          value={statusValue}
-          onChange={(e) => setStatusValue(e.target.value)}
-        >
-          <option value="">ALL</option>
-          <option value="OPEN">OPEN</option>
-          <option value="IN_PROGRESS">IN_PROGRESS</option>
-          <option value="RESOLVED">RESOLVED</option>
-        </select>
-        <label htmlFor="priority"> Priority </label>
-        <select
-          name="priority"
-          id="priority"
-          value={priorityValue}
-          onChange={(e) => setPriorityValue(e.target.value)}
-        >
-          <option value="">ALL</option>
-          <option value="LOW">LOW</option>
-          <option value="MEDIUM">MEDIUM</option>
-          <option value="HIGH">HIGH</option>
-        </select>
-      </div>
-      {loading ? (
-        <p>Loading tickets...</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Priority</th>
-              <th>Status</th>
-              <th>Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tickets.length === 0 ? (
-              <tr>
-                <td colSpan={4}>No tickets found!</td>
-              </tr>
-            ) : (
-              tickets.map((ticket) => (
-                <tr key={ticket.id}>
-                  <td>{ticket.title}</td>
-                  <td>{ticket.priority}</td>
-                  <td>{ticket.status}</td>
-                  <td>{new Date(ticket.created_at).toLocaleDateString()}</td>
+      <div className="panel">
+        <h1>Tickets Dashboard</h1>
+
+        {error && <p className="error-message">Error: {error}</p>}
+
+        <div className="controls">
+          <input
+            type="text"
+            placeholder="Search tickets..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+
+          <label htmlFor="status">Status</label>
+          <select
+            name="status"
+            id="status"
+            value={statusValue}
+            onChange={(e) => setStatusValue(e.target.value)}
+          >
+            <option value="">ALL</option>
+            <option value="OPEN">OPEN</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="RESOLVED">RESOLVED</option>
+          </select>
+
+          <label htmlFor="priority">Priority</label>
+          <select
+            name="priority"
+            id="priority"
+            value={priorityValue}
+            onChange={(e) => setPriorityValue(e.target.value)}
+          >
+            <option value="">ALL</option>
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+          </select>
+          <div className="buttons_group">
+            <button className="search-btn" onClick={handleSearch}>
+              Search
+            </button>
+            <button className="reset-btn" onClick={handleReset}>
+              Reset
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <p className="loading-text">Loading tickets...</p>
+        ) : (
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Created</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      )}
-      <div className="pagination">
-        <button
-          onClick={() =>
-            setPage((prevState) => (prevState === 1 ? 1 : prevState - 1))
-          }
-          disabled={page <= 1}
-        >
-          Prev
-        </button>{" "}
-        Page {page} of {totalPages}{" "}
-        <button
-          onClick={() =>
-            setPage((prevState) =>
-              prevState === totalPages ? totalPages : prevState + 1,
-            )
-          }
-          disabled={page >= totalPages}
-        >
-          Next
-        </button>
+              </thead>
+              <tbody>
+                {tickets.length === 0 ? (
+                  <tr>
+                    <td colSpan={4}>No tickets found!</td>
+                  </tr>
+                ) : (
+                  tickets.map((ticket) => (
+                    <tr key={ticket.id}>
+                      <td>{ticket.title}</td>
+                      <td>
+                        <span
+                          className={`badge priority-${ticket.priority.toLowerCase()}`}
+                        >
+                          {ticket.priority}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge status-${ticket.status.toLowerCase()}`}
+                        >
+                          {ticket.status.replace("_", " ")}
+                        </span>
+                      </td>
+                      <td>
+                        {new Date(ticket.created_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="pagination">
+          <button
+            onClick={() =>
+              setPage((prevState) => (prevState === 1 ? 1 : prevState - 1))
+            }
+            disabled={page <= 1}
+          >
+            Prev
+          </button>
+
+          <span className="page-indicator">
+            Page {page} of {totalPages}
+          </span>
+
+          <button
+            onClick={() =>
+              setPage((prevState) =>
+                prevState === totalPages ? totalPages : prevState + 1,
+              )
+            }
+            disabled={page >= totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

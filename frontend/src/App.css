@@ -1,4 +1,4 @@
-/* GLOBAL */
+GLOBAL */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
@@ -124,3 +124,16 @@ button:disabled {
 }
 
 /* #0f172a */
+@media (max-width: 600px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls input,
+  .controls select,
+  .controls button {
+    width: 100%;
+  }
+}
+
